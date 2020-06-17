@@ -57,11 +57,17 @@ class EditableTimerList extends React.Component {
 }
 
 class EditableTimer extends React.Component {
+    state = {
+        editFormOpen: false,
+    }
+
     render() {
-        const {title, project, elapsed, runningSince} = this.props;
-        if (this.props.editFormOpen) {
+        const {title, project, elapsed, runningSince, id} = this.props;
+        const {editFormOpen} = this.state;
+        if (editFormOpen) {
             return (
                 <TimerForm
+                    id={id}
                     title={title}
                     project={project}
                 />
@@ -69,6 +75,7 @@ class EditableTimer extends React.Component {
         } else {
             return (
                 <Timer
+                    id={id}
                     title={title}
                     project={project}
                     elapsed={elapsed}
@@ -80,8 +87,21 @@ class EditableTimer extends React.Component {
 }
 
 class TimerForm extends React.Component {
+
+    state = {
+        title: this.props.title || '',
+        project: this.props.project || '',
+    }
+
+    handleTitleChange = (e) => {
+        this.setState({title: e.target.value});
+    };
+    handleProjectChange = (e) => {
+        this.setState({project: e.target.value});
+    };
+
     render() {
-        const {title, project} = this.props;
+        const {title, project} = this.state;
         const submitText = this.props.title ? 'Update' : 'Create';
         return (
             <div className='ui centered card'>
@@ -89,11 +109,13 @@ class TimerForm extends React.Component {
                     <div className='ui form'>
                         <div className='field'>
                             <label>Title</label>
-                            <input type='text' defaultValue={title}/>
+                            <input type='text' value={title}
+                                   onChange={this.handleTitleChange}/>
                         </div>
                         <div className='field'>
                             <label>Project</label>
-                            <input type='text' defaultValue={project}/>
+                            <input type='text' value={project}
+                                   onChange={this.handleProjectChange}/>
                         </div>
                         <div className='ui two bottom attached buttons'>
                             <button className='ui basic blue button'>{submitText}</button>
@@ -107,14 +129,24 @@ class TimerForm extends React.Component {
 }
 
 class ToggleableTimerForm extends React.Component {
+    state = {
+        isOpen: false,
+    }
+
+    handleFormOpen = () => {
+        this.setState({isOpen: true});
+    };
+
     render() {
-        if (this.props.isOpen) {
+        const {isOpen} = this.state;
+        if (isOpen) {
             return (
                 <TimerForm/>
             );
         } else {
             return (<div className='ui basic content center aligned segment'>
-                <button className='ui basic button icon'>
+                <button className='ui basic button icon'
+                        onClick={this.handleFormOpen}>
                     <i className='plus icon'/>
                 </button>
             </div>);
